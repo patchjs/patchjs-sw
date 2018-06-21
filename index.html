@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--<meta name="patchjs" content="version=0.2.10">-->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,user-scalable=no">
+  <title>Patch.js demo</title>
+  <script type="text/javascript">
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+      .register('./sw.js')
+      .then(function() { console.log('Service Worker Registered!'); });
+    }
+  </script>
+</head>
+<body>
+  <span>Hello Patch.js</span>
+  <span id="time"></span>
+  <img src="./images/test.png" />
+</body>
+<script src="./dist/patchjs-sw/0.2.17/common.js"></script>
+<script src="./dist/patchjs-sw/0.2.17/index.js"></script>
+</html>

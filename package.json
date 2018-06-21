@@ -1,0 +1,27 @@
+{
+  "name": "patchjs-sw",
+  "description": "The SW examples of Patch.js",
+  "version": "0.2.17",
+  "author": {
+    "name": "yulongheli"
+  },
+  "contributors": [],
+  "keywords": [
+    "serviceworker",
+    "Service Worker"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack",
+    "start": "NODE_ENV=dev webpack-dev-server --inline false --content-base ./"
+  },
+  "devDependencies": {
+    "css-loader": "^0.28.0",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "patchjs-webpack-plugin": "^0.1.1",
+    "style-loader": "^0.16.1",
+    "uglifyjs-webpack-plugin": "^0.4.1",
+    "webpack": "^2.3.3",
+    "webpack-dev-server": "^2.4.2"
+  }
+}
