@@ -59,7 +59,8 @@ utils.fetch = function (url) {
 };
 
 // service worker
-var STATIC_VER = 'v1.1';
+var STATIC_VER = 'v1.0';
+var isCache = true; // control cache
 
 
 var cacheFiles = [
@@ -91,7 +92,7 @@ self.addEventListener('activate', function(e) {
 
 self.addEventListener('fetch', function(e) {
   var url = e.request.url;
-  if (/\d+\.\d+\.\d+\/.+css|js$/g.test(url)) { // whitelist
+  if (isCache && /\d+\.\d+\.\d+\/.+css|js$/g.test(url)) { // url whitelist
     var result = url.match(/\d+\.\d+\.\d+/g);
     var version = result[result.length - 1];
     var cacheUrl = url.replace(/\d+\.\d+\.\d+\//, '');
