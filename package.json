@@ -16,6 +16,10 @@
     "start": "NODE_ENV=dev webpack-dev-server --inline false --content-base ./"
   },
   "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-standard": "^7.1.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^2.1.1",
     "css-loader": "^0.28.0",
     "extract-text-webpack-plugin": "^2.1.0",
     "patchjs-webpack-plugin": "^0.1.1",

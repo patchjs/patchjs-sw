@@ -5,7 +5,7 @@ utils.withinCertainDiffRange = function (localVersion, version, diffCount) {
     var reg = /(\d+)\.(\d+)\.(\d+)/;
     var versionArray = version.match(reg);
     var localVersionArray = localVersion.match(reg);
-    if (versionArray[1] === localVersionArray[1] && versionArray[2] === localVersionArray[2] && 0 < versionArray[3] - localVersionArray[3] && versionArray[3] - localVersionArray[3] < diffCount) {
+    if (versionArray[1] === localVersionArray[1] && versionArray[2] === localVersionArray[2] && versionArray[3] - localVersionArray[3] > 0 && versionArray[3] - localVersionArray[3] < diffCount) {
       return true;
     }
   }
@@ -45,19 +45,19 @@ utils.fetch = function (url) {
           return {
             value: value,
             isDiffReq: isDiffReq
-          }
+          };
         });
       } else {
         return response.text();
       }
     } else if (response.status === 404) {
-      if(isDiffReq) {
+      if (isDiffReq) {
         utils.fetch(url.replace(diffVersionReg, ''));
       } else {
         throw new Error('Not Found');
       }
     }
-  })
+  });
 };
 
 utils.clone = function (dest, src) {
@@ -80,7 +80,7 @@ var globalConfig = {
     increment: true,
     urlRule: /\d+\.\d+\.\d+\/(common|index)\.(css|js)$/
   },
-  precache:[]
+  precache: []
 };
 
 function installEventListener (event) {
@@ -93,8 +93,8 @@ function installEventListener (event) {
 
 function activateEventListener (event) {
   event.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(keys.map(function(key) {
+    caches.keys().then(function (keys) {
+      return Promise.all(keys.map(function (key) {
         if (key !== globalConfig.cacheId) {
           return caches.delete(key);
         }
@@ -115,7 +115,7 @@ function fetchEventListener (event) {
     var finalResponse = caches.match(cacheUrl).then(function (cache) {
       if (!cache) {
         return utils.fetch(url).then(function (value) {
-          caches.open(globalConfig.cacheId).then(function(cache) {
+          caches.open(globalConfig.cacheId).then(function (cache) {
             cache.put(new Request(cacheUrl), new Response(JSON.stringify({
               code: value,
               version: version
@@ -161,12 +161,12 @@ function fetchEventListener (event) {
       });
     });
     event.respondWith(finalResponse);
-  } else if(globalConfig.urlRule.test(url)) {
+  } else if (globalConfig.urlRule.test(url)) {
     // cache fisrt
     event.respondWith(
-      caches.match(event.request).then(function(cache) {
+      caches.match(event.request).then(function (cache) {
         return cache || fetch(event.request).then(function (response) {
-          caches.open(globalConfig.cacheId).then(function(cache) {
+          caches.open(globalConfig.cacheId).then(function (cache) {
             cache.put(event.request, response);
           });
           return response.clone();
@@ -176,7 +176,7 @@ function fetchEventListener (event) {
   } else {
     // networkonly
     event.respondWith(
-      caches.match(event.request).then(function(cache) {
+      caches.match(event.request).then(function (cache) {
         return cache || fetch(event.request);
       })
     );
