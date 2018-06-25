@@ -18,3 +18,15 @@ sw.config({
   	'https://gw.alipayobjects.com/zos/rmsportal/CtJlgAZbmyeSCLxqsgqF.png'
   ],
 }).run();
+
+self.addEventListener('error', event => {
+  // event.message
+  // event.filename
+  // event.lineno
+  // event.colno
+  // event.error.stack
+});
+
+self.addEventListener('unhandledrejection', event => {
+  // event.reason
+});
