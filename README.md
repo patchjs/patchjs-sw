@@ -2,7 +2,15 @@
 
 enhance the ability of service worker.
 
-come soon...
 
-https://caniuse.com/#feat=serviceworkers
+# sw.js
 
+importScripts('./sw-core.js');
+
+sw.config({
+  cacheId: 'cachedb',
+  precache: [
+  	'./images/test.png',
+  	'https://gw.alipayobjects.com/zos/rmsportal/CtJlgAZbmyeSCLxqsgqF.png'
+  ],
+}).run();
