@@ -7,5 +7,9 @@ module.exports = {
   "rules": {
     "semi": [2, "always"],
     "no-eval": 0
+  },
+  "env": {
+    "browser": true,
+    "serviceworker": true
   }
 };

@@ -72,6 +72,11 @@ utils.clone = function (dest, src) {
   }
 };
 
+var contentTypeMapping = {
+  'js': 'application/x-javascript',
+  'css': 'ext/css'
+};
+
 // service worker parts
 var globalConfig = {
   cacheId: 'cachedb',
@@ -85,7 +90,7 @@ var globalConfig = {
 
 function installEventListener (event) {
   event.waitUntil(
-    caches.open(globalConfig.cacheId).then(function(cache) {
+    caches.open(globalConfig.cacheId).then(function (cache) {
       return cache.addAll(globalConfig.precache);
     })
   );
@@ -112,6 +117,7 @@ function fetchEventListener (event) {
     var result = url.match(/\d+\.\d+\.\d+/g);
     var version = result[result.length - 1];
     var cacheUrl = url.replace(/\d+\.\d+\.\d+\//, '');
+    var extName = url.substring(url.lastIndexOf('.') + 1);
     var finalResponse = caches.match(cacheUrl).then(function (cache) {
       if (!cache) {
         return utils.fetch(url).then(function (value) {
@@ -124,7 +130,10 @@ function fetchEventListener (event) {
             }));
           });
           return new Response(value, {
-            'status': 200
+            'status': 200,
+            'headers': {
+              'Content-Type': contentTypeMapping[extName]
+            }
           });
         });
       }
@@ -133,7 +142,10 @@ function fetchEventListener (event) {
         var assetsCode = item.code;
         if (item.version === version && assetsCode) {
           return new Response(assetsCode, {
-            'status': 200
+            'status': 200,
+            'headers': {
+              'Content-Type': contentTypeMapping[extName]
+            }
           });
         } else {
           var increment = item.code && utils.withinCertainDiffRange(item.version, version, 5);
@@ -145,7 +157,7 @@ function fetchEventListener (event) {
             } else {
               assetsCode = result;
             }
-            caches.open(globalConfig.cacheId).then(function(cache) {
+            caches.open(globalConfig.cacheId).then(function (cache) {
               cache.put(new Request(cacheUrl), new Response(JSON.stringify({
                 code: assetsCode,
                 version: version
@@ -154,7 +166,10 @@ function fetchEventListener (event) {
               }));
             });
             return new Response(assetsCode, {
-              'status': 200
+              'status': 200,
+              'headers': {
+                'Content-Type': contentTypeMapping[extName]
+              }
             });
           });
         }
@@ -183,14 +198,15 @@ function fetchEventListener (event) {
   }
 };
 
-var sw = {
-  config: function (options) {
-    utils.clone(globalConfig, options);
-    return this;
-  },
-  run: function () {
-    self.addEventListener('install', installEventListener);
-    self.addEventListener('activate', activateEventListener);
-    self.addEventListener('fetch', fetchEventListener);
-  }
+var sw = {};
+
+sw.config = function (options) {
+  utils.clone(globalConfig, options);
+  return this;
+};
+
+sw.run = function () {
+  self.addEventListener('install', installEventListener);
+  self.addEventListener('activate', activateEventListener);
+  self.addEventListener('fetch', fetchEventListener);
 };
