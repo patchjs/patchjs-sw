@@ -14,9 +14,9 @@ var defaultConfig = {
 sw.config({
   cacheId: 'cachedb',
   precache: [
-  	'./images/test.png',
-  	'https://gw.alipayobjects.com/zos/rmsportal/CtJlgAZbmyeSCLxqsgqF.png'
-  ],
+    './images/test.png',
+    'https://gw.alipayobjects.com/zos/rmsportal/CtJlgAZbmyeSCLxqsgqF.png'
+  ]
 }).run();
 
 self.addEventListener('error', event => {
