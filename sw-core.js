@@ -74,7 +74,7 @@ utils.clone = function (dest, src) {
 
 var contentTypeMapping = {
   'js': 'application/x-javascript',
-  'css': 'ext/css'
+  'css': 'text/css'
 };
 
 // service worker parts
