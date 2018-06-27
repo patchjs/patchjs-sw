@@ -63,7 +63,7 @@ var globalConfig = {
     urlRule: /\d+\.\d+\.\d+\/(common|index)\.(css|js)$/
   },
   precache: [],
-  networkErr: noop,
+  requestErr: noop,
   exceedQuotaErr: noop
 };
 
@@ -90,7 +90,7 @@ function customFetch (url) {
       }
     }
   }).catch(function (error) {
-    globalConfig.networkErr(error);
+    globalConfig.requestErr(error);
   });
 };
 
@@ -200,7 +200,7 @@ function fetchEventListener (event) {
           });
           return response.clone();
         }).catch(function (error) {
-          globalConfig.networkErr(error);
+          globalConfig.requestErr(error);
         });
       })
     );
@@ -209,7 +209,7 @@ function fetchEventListener (event) {
     event.respondWith(
       caches.match(event.request).then(function (cache) {
         return cache || fetch(event.request).catch(function (error) {
-          globalConfig.networkErr(error);
+          globalConfig.requestErr(error);
         });
       })
     );

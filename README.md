@@ -43,6 +43,24 @@ the URL rules will be cached.
 
 <br/>
 
+**requestErr** `Function`
+
+**default** `noop`
+
+when the request is error, the callback will be triggered.
+
+<br/>
+
+**exceedQuotaErr** `Function`
+
+**default** `noop`
+
+when the quota isn't enough, trigger the function of exceedQuotaErr.
+
+<br/>
+
+trigger the function of exceedQuotaErr
+
 **patchjs.increment** `Boolean`
 
 **default** `true`

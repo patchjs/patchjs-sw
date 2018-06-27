@@ -8,7 +8,7 @@ var defaultConfig = {
     urlRule: /\d+\.\d+\.\d+\/(common|index)\.(css|js)$/
   },
   precache: [],
-  networkErr: function (error) {},
+  requestErr: function (error) {},
   exceedQuotaErr: function (error) {}
 };
 */
@@ -33,7 +33,7 @@ sw.config({
     './images/test.png',
     'https://gw.alipayobjects.com/zos/rmsportal/CtJlgAZbmyeSCLxqsgqF.png'
   ],
-  networkErr: function (error) {
+  requestErr: function (error) {
     console.log(error);
   },
   exceedQuotaErr: function (error) {
