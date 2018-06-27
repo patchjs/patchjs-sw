@@ -35,31 +35,6 @@ utils.mergeCode = function (source, chunkSize, diffCodeArray) {
   return jsCode;
 };
 
-utils.fetch = function (url) {
-  var diffVersionReg = /-\d+\.\d+\.\d+/;
-  var isDiffReq = diffVersionReg.test(url);
-  return fetch(url).then(function (response) {
-    if (response.status === 200 || response.status === 304) {
-      if (isDiffReq) {
-        return response.text().then(function (value) {
-          return {
-            value: value,
-            isDiffReq: isDiffReq
-          };
-        });
-      } else {
-        return response.text();
-      }
-    } else if (response.status === 404) {
-      if (isDiffReq) {
-        utils.fetch(url.replace(diffVersionReg, ''));
-      } else {
-        throw new Error('Not Found');
-      }
-    }
-  });
-};
-
 utils.clone = function (dest, src) {
   for (var p in src) {
     if (src.hasOwnProperty(p) && src[p]) {
@@ -77,6 +52,8 @@ var contentTypeMapping = {
   'css': 'text/css'
 };
 
+function noop () {}
+
 // service worker parts
 var globalConfig = {
   cacheId: 'cachedb',
@@ -85,7 +62,36 @@ var globalConfig = {
     increment: true,
     urlRule: /\d+\.\d+\.\d+\/(common|index)\.(css|js)$/
   },
-  precache: []
+  precache: [],
+  networkErr: noop,
+  exceedQuotaErr: noop
+};
+
+function customFetch (url) {
+  var diffVersionReg = /-\d+\.\d+\.\d+/;
+  var isDiffReq = diffVersionReg.test(url);
+  return fetch(url).then(function (response) {
+    if (response.status === 200 || response.status === 304) {
+      if (isDiffReq) {
+        return response.text().then(function (value) {
+          return {
+            value: value,
+            isDiffReq: isDiffReq
+          };
+        });
+      } else {
+        return response.text();
+      }
+    } else if (response.status === 404) {
+      if (isDiffReq) {
+        customFetch(url.replace(diffVersionReg, ''));
+      } else {
+        return Promise.reject(new Error('Not Found'));
+      }
+    }
+  }).catch(function (error) {
+    globalConfig.networkErr(error);
+  });
 };
 
 function installEventListener (event) {
@@ -120,14 +126,16 @@ function fetchEventListener (event) {
     var extName = url.substring(url.lastIndexOf('.') + 1);
     var finalResponse = caches.match(cacheUrl).then(function (cache) {
       if (!cache) {
-        return utils.fetch(url).then(function (value) {
+        return customFetch(url).then(function (value) {
           caches.open(globalConfig.cacheId).then(function (cache) {
             cache.put(new Request(cacheUrl), new Response(JSON.stringify({
               code: value,
               version: version
             }), {
               'status': 200
-            }));
+            })).catch(function (error) {
+              globalConfig.exceedQuotaErr(error);
+            });
           });
           return new Response(value, {
             'status': 200,
@@ -150,21 +158,25 @@ function fetchEventListener (event) {
         } else {
           var increment = item.code && utils.withinCertainDiffRange(item.version, version, 5);
           var diffUrl = utils.combineReqUrl(url, increment, item.version);
-          return utils.fetch(diffUrl).then(function (result) {
-            if (result.isDiffReq) {
-              var diffData = JSON.parse(result.value);
-              assetsCode = diffData.m ? utils.mergeCode(assetsCode, diffData.l, diffData.c) : assetsCode;
-            } else {
-              assetsCode = result;
+          return customFetch(diffUrl).then(function (result) {
+            if (result) {
+              if (result.isDiffReq) {
+                var diffData = JSON.parse(result.value);
+                assetsCode = diffData.m ? utils.mergeCode(assetsCode, diffData.l, diffData.c) : assetsCode;
+              } else {
+                assetsCode = result;
+              }
+              caches.open(globalConfig.cacheId).then(function (cache) {
+                cache.put(new Request(cacheUrl), new Response(JSON.stringify({
+                  code: assetsCode,
+                  version: version
+                }), {
+                  'status': 200
+                })).catch(function (error) {
+                  globalConfig.exceedQuotaErr(error);
+                });
+              });
             }
-            caches.open(globalConfig.cacheId).then(function (cache) {
-              cache.put(new Request(cacheUrl), new Response(JSON.stringify({
-                code: assetsCode,
-                version: version
-              }), {
-                'status': 200
-              }));
-            });
             return new Response(assetsCode, {
               'status': 200,
               'headers': {
@@ -182,9 +194,13 @@ function fetchEventListener (event) {
       caches.match(event.request).then(function (cache) {
         return cache || fetch(event.request).then(function (response) {
           caches.open(globalConfig.cacheId).then(function (cache) {
-            cache.put(event.request, response);
+            cache.put(event.request, response).catch(function (error) {
+              globalConfig.exceedQuotaErr(error);
+            });
           });
           return response.clone();
+        }).catch(function (error) {
+          globalConfig.networkErr(error);
         });
       })
     );
@@ -192,7 +208,9 @@ function fetchEventListener (event) {
     // networkonly
     event.respondWith(
       caches.match(event.request).then(function (cache) {
-        return cache || fetch(event.request);
+        return cache || fetch(event.request).catch(function (error) {
+          globalConfig.networkErr(error);
+        });
       })
     );
   }
