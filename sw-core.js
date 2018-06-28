@@ -70,7 +70,7 @@ var globalConfig = {
 function customFetch (url) {
   var diffVersionReg = /-\d+\.\d+\.\d+/;
   var isDiffReq = diffVersionReg.test(url);
-  return fetch(url).then(function (response) {
+  return fetch(url, {mode: 'no-cors'}).then(function (response) {
     if (response.status === 200 || response.status === 304) {
       if (isDiffReq) {
         return response.text().then(function (value) {
@@ -192,7 +192,7 @@ function fetchEventListener (event) {
     // cache fisrt
     event.respondWith(
       caches.match(event.request).then(function (cache) {
-        return cache || fetch(event.request).then(function (response) {
+        return cache || fetch(event.request, {mode: 'no-cors'}).then(function (response) {
           caches.open(globalConfig.cacheId).then(function (cache) {
             cache.put(event.request, response).catch(function (error) {
               globalConfig.exceedQuotaErr(error);
@@ -200,15 +200,6 @@ function fetchEventListener (event) {
           });
           return response.clone();
         }).catch(function (error) {
-          globalConfig.requestErr(error);
-        });
-      })
-    );
-  } else {
-    // networkonly
-    event.respondWith(
-      caches.match(event.request).then(function (cache) {
-        return cache || fetch(event.request).catch(function (error) {
           globalConfig.requestErr(error);
         });
       })
