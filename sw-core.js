@@ -60,7 +60,7 @@ var globalConfig = {
   urlRule: /https?:\/\/.+\.(jpg|gif|png|jpeg|webp|js|css)$/,
   patchjs: {
     increment: true,
-    urlRule: /\d+\.\d+\.\d+\/(common|index)\.(css|js)$/
+    urlRule: /\d+\.\d+\.\d+\/.+\.(css|js)$/
   },
   precache: [],
   requestErr: noop,
