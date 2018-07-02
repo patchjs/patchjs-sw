@@ -124,7 +124,7 @@ function fetchEventListener (event) {
     var version = result[result.length - 1];
     var cacheUrl = url.replace(/\d+\.\d+\.\d+\//, '');
     var extName = url.substring(url.lastIndexOf('.') + 1);
-    var finalResponse = caches.match(cacheUrl).then(function (cache) {
+    var finalResponse = caches.match(cacheUrl, {ignoreSearch: true}).then(function (cache) {
       if (!cache) {
         return customFetch(url).then(function (value) {
           caches.open(globalConfig.cacheId).then(function (cache) {
@@ -191,7 +191,7 @@ function fetchEventListener (event) {
   } else if (globalConfig.urlRule.test(url)) {
     // cache fisrt
     event.respondWith(
-      caches.match(event.request).then(function (cache) {
+      caches.match(event.request, {ignoreSearch: true}).then(function (cache) {
         return cache || fetch(event.request).then(function (response) {
           caches.open(globalConfig.cacheId).then(function (cache) {
             cache.put(event.request, response).catch(function (error) {
