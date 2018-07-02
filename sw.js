@@ -2,7 +2,7 @@ importScripts('./sw-core.js');
 /*
 var defaultConfig = {
   cacheId: 'cachedb',
-  urlRule: /https?:\/\/.+\.(jpg|gif|png|jpeg|webp|js|css)$/,
+  urlRule: /https?:\/\/.+\.(jpg|gif|png|jpeg|webp|js|css|html)$/,
   patchjs: {
     increment: true,
     urlRule: /\d+\.\d+\.\d+\/(common|index)\.(css|js)$/
@@ -30,9 +30,12 @@ self.addEventListener('unhandledrejection', function (event) {
 sw.config({
   cacheId: 'cachedb',
   precache: [
+    '/',
+    './index.html',
     './images/test.png',
     'https://gw.alipayobjects.com/zos/rmsportal/CtJlgAZbmyeSCLxqsgqF.png'
   ],
+  urlRule: /https?:\/\/.+\.(jpg|gif|png|jpeg|webp|js|css|html)/,
   requestErr: function (error) {
     console.log(error);
   },
