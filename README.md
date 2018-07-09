@@ -71,7 +71,7 @@ It enables the incremental load.
 
 **patchjs.urlRule** `RegRex`
 
-**default** `/\d+\.\d+\.\d+\/(common|index)\.(css|js)$/`
+**default** `/\d+\.\d+\.\d+\/.+\.(css|js)$/`
 
 the URL rules will be cached by Patch.js.
 
