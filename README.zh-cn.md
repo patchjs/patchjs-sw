@@ -1,9 +1,9 @@
-## Introduction
+## 介绍
 
-enhance the ability of service worker.
+在 service worker 里面实现字符级的文件更新。
 
 
-## sw.js example
+## sw.js 样例
 
 ```js
 importScripts('./sw-core.js');
@@ -17,13 +17,13 @@ sw.config({
 }).run();
 ```
 
-## Options
+## 配置项
 
 **cacheId** `String`
 
 **default** `cachedb`
 
-cache name.
+指定唯一的缓存 ID 名称。 
 
 <br/>
 
@@ -31,7 +31,7 @@ cache name.
 
 **default** `[]`
 
-pre-cached list.
+预加载的静态资源列表。
 
 <br/>
 
@@ -39,7 +39,7 @@ pre-cached list.
 
 **default** `/https?:\/\/.+\.(jpg|gif|png|jpeg|webp|js|css)$/`
 
-the URL rules will be cached.
+通过正则指定静态资源缓存 URL 的规则。
 
 <br/>
 
@@ -47,7 +47,7 @@ the URL rules will be cached.
 
 **default** `noop`
 
-when the request is error, the callback will be triggered.
+当请求报错的时候，会触发这个回调函数。
 
 <br/>
 
@@ -55,15 +55,16 @@ when the request is error, the callback will be triggered.
 
 **default** `noop`
 
-when the quota isn't enough, trigger the function of exceedQuotaErr.
+当本地存储空间不够时，会触发这个回调函数。
 
 <br/>
+
 
 **patchjs.increment** `Boolean`
 
 **default** `true`
 
-It enables the incremental load.
+是否开启字符级更新机制。
 
 <br/>
 
@@ -71,6 +72,6 @@ It enables the incremental load.
 
 **default** `/\d+\.\d+\.\d+\/.+\.(css|js)$/`
 
-the URL rules will be cached by Patch.js.
+指定通过 Patchjs 缓存静态资源 URL 的规则。
 
 <br/>
